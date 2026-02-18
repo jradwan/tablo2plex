@@ -372,22 +372,30 @@ async function makeTabloRequest(method, host, path, msg = "", headers = {}, para
 
     Logger.debug(msg);
 
-    return await fetch(
-        baseUrl.toString(),
-        {
-            method: method,
-            headers: headers,
-            body: method == "POST" ? body : undefined
-        }
-    ).then(async response => {
-        if (response) {
-            return Buffer.from(await response.arrayBuffer());
-        } else {
-            Logger.error(`Fetching device ${url}`);
+    try {
+        return await fetch(
+            baseUrl.toString(),
+            {
+                method: method,
+                headers: headers,
+                body: method == "POST" ? body : undefined
+            }
+        ).then(async response => {
+            if (response) {
+                return Buffer.from(await response.arrayBuffer());
+            } else {
+                Logger.error(`Fetch response from device ${url}`);
 
-            return Buffer.alloc(0);
-        }
-    });
+                return Buffer.alloc(0);
+            }
+        });
+    } catch (error) {
+        Logger.error(`Fetching device ${url}`);
+
+        Logger.error(error);
+
+        return Buffer.alloc(0);
+    }
 };
 
 /**
